@@ -40,15 +40,15 @@ start()->
 logging()->
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME}]),
   
-    true=?LOG_DEBUG("debug_1",[]),
-    true=?LOG_NOTICE("notice_1",[]),
-    true=?LOG_WARNING("warning_1",[{a,1},atom]),    
-    true=?LOG_ALERT("alert_1",[]),
+    ok=?LOG_DEBUG("debug_1",[]),
+    ok=?LOG_NOTICE("notice_1",[]),
+    ok=?LOG_WARNING("warning_1",[{a,1},atom]),    
+    ok=?LOG_ALERT("alert_1",[]),
     
     Term={error,[eexists,{?MODULE,?FUNCTION_NAME}]},
     R= io_lib:format("~p",[Term]),
     TermAsStering=lists:flatten(R),
-    true=?LOG_ALERT(TermAsStering,[]),
+    ok=?LOG_ALERT(TermAsStering,[]),
 
     ok.
 
