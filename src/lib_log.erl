@@ -12,10 +12,9 @@
 -module(lib_log).    
  
 -export([
-	 create_logfile/4,
-	 create_logfile/5,
-	 parse/1,
-	 create_logger/1
+	 create_logger/5,
+	 parse/1
+
 	]).
 
 %% --------------------------------------------------------------------
@@ -23,39 +22,7 @@
 %% --------------------------------------------------------------------
 -include_lib("kernel/include/logger.hrl").
 
-%%--------------------------------------------------------------------
-%% @doc
-%% @spec
-%% @end
-%%--------------------------------------------------------------------
-create_logfile(MainLogDir,_LogFile,LogFilePath,_MaxLogLength)->
-    R1=file:make_dir(MainLogDir),
-   % case filelib:is_file(LogFilePath) of
-%	false->
-%	    file:write_file(LogFilePath," ");
-%	true->
-%%%%%	    ok
-   % end,
-    R3=create_logger(LogFilePath),
- 
-    {ok,[R1,R3]}.
-%%--------------------------------------------------------------------
-%% @doc
-%% @spec
-%% @end
-%%--------------------------------------------------------------------
-create_logfile(MainLogDir,ProviderLogDir,_LogFile,LogFilePath,_MaxLogLength)->
-    R1=file:make_dir(MainLogDir),
-    R2=file:make_dir(ProviderLogDir),
-   % case filelib:is_file(LogFilePath) of
-%	false->
-%	    file:write_file(LogFilePath," ");
-%	true->
-%%%%%	    ok
-   % end,
-    R3=create_logger(LogFilePath),
- 
-    {ok,[R1,R2,R3]}.
+
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -97,7 +64,13 @@ parse_item({TimeStamp,_Time,SenderNode,SenderPid,Module,Function,Line,Data,MsgAs
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
 %create_logger(LogDir)->
-create_logger(LogFile)->
+
+create_logger(MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
+    LocalLogDirFullPath=filename:join(MainLogDir,LocalLogDir),
+    LogFileFullPath=filename:join(LocalLogDirFullPath,LogFile),
+  
+    file:make_dir(MainLogDir),
+    file:make_dir(LocalLogDirFullPath),
     Result=case logger:add_handler(my_standar_disk_h, logger_std_h,
 			  #{formatter => {logger_formatter,
 					  #{ template => [
@@ -113,14 +86,14 @@ create_logger(LogFile)->
 							  sender_data,"\n"
 							 ]}}}) of
 	       {error,Reason}->
-		   {error,["Error when creating LogFile :",Reason,?MODULE,?LINE]};
+		   {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
 	       ok->
 		   case logger:add_handler(my_disk_log_h, logger_disk_log_h,
 			  #{
-			    config => #{file => LogFile,
+			    config => #{file => LogFileFullPath,
 					type => wrap,
-					max_no_files => 4,
-					max_no_bytes =>1000*100,
+					max_no_files => MaxNumFiles,  % 4
+					max_no_bytes => MaxNumBytes,    %1000*100,
 					filesync_repeat_interval => 1000},
 			    formatter => {logger_formatter,
 					    #{ template => [
@@ -136,7 +109,7 @@ create_logger(LogFile)->
 							    sender_data,"\n"
 							   ]}}}) of
 		       {error,Reason}->
-			   {error,["Error when creating LogFile :",LogFile,Reason,?MODULE,?LINE]};
+			   {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
 		       ok-> 
 			   ok
 		   end

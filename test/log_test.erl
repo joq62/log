@@ -18,6 +18,8 @@
 %% Include files
 %% --------------------------------------------------------------------
 -include("log.api").
+
+
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
 %% Description: Based on hosts.config file checks which hosts are avaible
@@ -66,7 +68,7 @@ read_test()->
 
     [
      {_,'do_test@c50',_,log_test,logging,_,"\"notice_1\"",[]},
-     {_,'do_test@c50',_,log,handle_info,_,"\"Server started and created log file with result\"",[{ok,[ok,ok]}]}
+     {_,'do_test@c50',_,log,init,_,"\"Server started \"",[]}
     ]=log:raw(notice),
 
     [
@@ -88,7 +90,7 @@ read_test()->
 %% -------------------------------------------------------------------
 setup()->
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME}]),
-  
+   
     
 
     ok.

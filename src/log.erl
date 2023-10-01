@@ -15,6 +15,8 @@
 -include("logs.hrl").
 %% API
 -export([
+	 create_logger/5,
+
 	 is_config/0,
 	 config/1,
 	 raw/1,
@@ -44,6 +46,11 @@
 		warning=[],
 		alert=[],
 		main_log_dir,
+		local_log_dir,
+		logfile,
+		max_num_files,
+		max_num_bytes,
+		
 		log_file_path,
 		log_file,
 		max_log_length
@@ -69,6 +76,14 @@ start_link() ->
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+create_logger(MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
+    gen_server:call(?SERVER, {create_logger,MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes},infinity).
+
 %%--------------------------------------------------------------------
 %% @doc
 %% @spec
@@ -129,12 +144,9 @@ get_state()->
 %% @end
 %%--------------------------------------------------------------------
 init([]) ->
-    {ok, #state{
-	    main_log_dir=?MainLogDir,
-	    log_file_path=?LogFilePath,
-	    log_file=?LogFile,
-	    max_log_length=?MaxLogLength},0
-    }.
+
+    ?LOG_NOTICE("Server started ",[]),
+    {ok, #state{}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -142,6 +154,15 @@ init([]) ->
 %% Handling call messages
 %% @end
 %%--------------------------------------------------------------------
+handle_call({create_logger,MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes},_From, State) ->
+    Reply=rpc:call(node(),lib_log,create_logger,[MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes],5000),
+    NewState=State#state{main_log_dir=MainLogDir,
+			 local_log_dir=LocalLogDir,	
+			 logfile=LogFile,
+			 max_num_files=MaxNumFiles,
+			 max_num_bytes=MaxNumBytes},
+    {reply, Reply, NewState};
+
 handle_call({read,Level},_From, State) ->
     Reply = case Level of
 		debug->
@@ -172,10 +193,6 @@ handle_call({raw,Level},_From, State) ->
 		    {error,["Unmatched level ",Unmatched,?MODULE,?LINE]}
 	    end,
     
-    {reply, Reply, State};
-
-handle_call({create,LogFile},_From, State) ->
-    Reply=rpc:call(node(),lib_logger,create_logger,[LogFile],5000),
     {reply, Reply, State};
 
 handle_call({get_state},_From, State) ->

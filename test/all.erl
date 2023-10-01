@@ -16,6 +16,11 @@
 %% Include files
 %% --------------------------------------------------------------------
 
+-define(MainLogDir,"logs").
+-define(LocalLogDir,"log.logs").
+-define(LogFile,"test_logfile").
+-define(MaxNumFiles,10).
+-define(MaxNumBytes,100000).
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
@@ -48,11 +53,12 @@ start()->
 setup()->
     io:format("Start ~p~n",[{?MODULE,?FUNCTION_NAME}]),
   
-    file:del_dir_r("logs"),
-
+    file:del_dir_r(?MainLogDir),
     ok=application:start(log),
     pong=log:ping(),
-    
+    ok=log:create_logger(?MainLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
+    timer:sleep(2000),
+
     io:format("Stop OK !!! ~p~n",[{?MODULE,?FUNCTION_NAME}]),
 
     ok.
