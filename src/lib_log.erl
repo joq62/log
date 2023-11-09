@@ -87,15 +87,27 @@ create_logger(MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
 							 ]}}}) of
 	       {error,Reason}->
 		   {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
+	       {error,{already_exist,my_standar_disk_h}}->
+		   add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes);
 	       ok->
-		   case logger:add_handler(my_disk_log_h, logger_disk_log_h,
-			  #{
-			    config => #{file => LogFileFullPath,
-					type => wrap,
-					max_no_files => MaxNumFiles,  % 4
-					max_no_bytes => MaxNumBytes,    %1000*100,
-					filesync_repeat_interval => 1000},
-			    formatter => {logger_formatter,
+		   add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes)
+	   end,
+    Result.
+
+%% --------------------------------------------------------------------
+%% Function:start/0 
+%% Description: Initiate the eunit tests, set upp needed processes etc
+%% Returns: non
+%% -------------------------------------------------------------------
+add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes)->
+    case logger:add_handler(my_disk_log_h, logger_disk_log_h,
+			    #{
+			      config => #{file => LogFileFullPath,
+					  type => wrap,
+					  max_no_files => MaxNumFiles,  % 4
+					  max_no_bytes => MaxNumBytes,    %1000*100,
+					  filesync_repeat_interval => 1000},
+			      formatter => {logger_formatter,
 					    #{ template => [
 							    timestamp," | ",
 							    sender_time," | ",
@@ -108,16 +120,8 @@ create_logger(MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
 							    msg," | ",
 							    sender_data,"\n"
 							   ]}}}) of
-		       {error,Reason}->
-			   {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
+	{error,Reason}->
+	    {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
 		       ok-> 
-			   ok
-		   end
-	   end,
-    Result.
-
-%% --------------------------------------------------------------------
-%% Function:start/0 
-%% Description: Initiate the eunit tests, set upp needed processes etc
-%% Returns: non
-%% -------------------------------------------------------------------
+	    ok
+    end.
