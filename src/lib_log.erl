@@ -100,6 +100,7 @@ create_logger(MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
 %% Returns: non
 %% -------------------------------------------------------------------
 add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes)->
+    io:format("add_handler ~p~n",[{LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes,?MODULE,?LINE}]),
     case logger:add_handler(my_disk_log_h, logger_disk_log_h,
 			    #{
 			      config => #{file => LogFileFullPath,
