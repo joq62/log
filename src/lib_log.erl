@@ -26,7 +26,7 @@
 
 %%--------------------------------------------------------------------
 %% @doc
-%% @spec
+%% 
 %% @end
 %%--------------------------------------------------------------------
 
@@ -85,10 +85,10 @@ create_logger(MainLogDir,LocalLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
 							  msg," | ",
 							  sender_data,"\n"
 							 ]}}}) of
-	       {error,Reason}->
-		   {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
 	       {error,{already_exist,my_standar_disk_h}}->
 		   add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes);
+	       {error,Reason}->
+		   {error,["Error when creating LogFile :",LocalLogDirFullPath,Reason,?MODULE,?LINE]};
 	       ok->
 		   add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes)
 	   end,
