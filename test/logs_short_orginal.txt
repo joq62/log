@@ -1,3 +1,5 @@
+   TimeStamp         |   {date(),time()}        | level  | node()         | pid()     | Module| Function | Line | IfonText  | Args
+   
                      |                          | error  |                |           |      |      |     | Supervisor: {local,control_sup}. Context: shutdown. Reason: reached_max_restart_intensity. Offender: id=appl_ctrl,pid=<0.273.0>. |
                      |                          | notice |                |           |      |      |     | Application: control. Exited: shutdown. Type: temporary. |
                      |                          | notice |                |           |      |      |     | SIGTERM received - shutting down |
