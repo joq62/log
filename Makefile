@@ -39,7 +39,7 @@ no_ebin_commit:
 	mkdir ebin;		
 	rebar3 compile;	
 	cp _build/default/lib/*/ebin/* ebin;
-	rm -rf _build*;
+	rm -rf _build;
 	rm -rf ebin;
 	rebar3 edoc;
 #	git add *;
@@ -72,7 +72,7 @@ with_ebin_commit:
 	mkdir ebin;		
 	rebar3 compile;	
 	cp _build/default/lib/*/ebin/* ebin;
-	rm -rf _build*;
+	rm -rf _build;
 #	rm -rf ebin;
 #	git add *;
 	git status
@@ -101,7 +101,7 @@ build:
 	mkdir ebin;		
 	rebar3 compile;	
 	cp _build/default/lib/*/ebin/* ebin;
-	rm -rf _build*;
+	rm -rf _build;
 	rebar3 edoc;
 	#INFO: build ENDED SUCCESSFUL
 clean:
