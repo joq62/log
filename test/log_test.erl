@@ -24,11 +24,11 @@
 
 
 
--define(MainLogDir,"logs").
--define(LocalLogDir,"log.logs").
--define(LogFile,"test_logfile").
--define(MaxNumFiles,10).
--define(MaxNumBytes,100000).
+%-define(MainLogDir,"logs").
+%-define(LocalLogDir,"log.logs").
+%-define(LogFile,"test_logfile").
+%-define(MaxNumFiles,10).
+%-define(MaxNumBytes,100000).
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
