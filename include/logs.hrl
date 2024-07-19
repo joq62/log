@@ -1,4 +1,4 @@
--define(MainLogDir,"logs").
+%-define(MainLogDir,"logs").
 -define(MaxLogLength,10000).
 -define(LogFile,"central.log").
 -define(LogFilePath,"logs/control.logs").
