@@ -21,7 +21,9 @@ all:
 	#INFO: Deleting files and dirs created during execution/runtime 
 	rm -rf logs;
 	rm -rf *_a;
-	#INFO: Compile application		
+	#INFO: Compile application
+	rm -rf common_include;
+	cp -r ~/erlang/simple_system/common_include .
 	rebar3 compile;	
 	rm -rf _build*;
 	rebar3 edoc;
@@ -49,6 +51,8 @@ build:
 	rm -rf test/*.beam test/*/*.beam;
 	rm -rf *.beam;
 	#INFO: Deleting files and dirs created during builds
+	rm -rf common_include;
+	cp -r ~/erlang/simple_system/common_include .
 	rm -rf _build;
 	rm -rf ebin;
 	rm -rf rebar.lock
@@ -86,7 +90,7 @@ clean:
 	#INFO: clean ENDED SUCCESSFUL
 eunit: 
 	#INFO: eunit STARTED
-	#INFO: Cleaning up to prepare build STARTED	 
+	#INFO: Cleaning up to prepare build STARTED
 	#INFO: Deleting crash reports
 	rm -rf erl_cra* rebar3_crashreport_GLURK;
 	#INFO: Deleting euinit test applications dirs
@@ -100,6 +104,8 @@ eunit:
 	rm -rf test/*.beam test/*/*.beam;
 	rm -rf *.beam;
 	#INFO: Deleting files and dirs created during builds
+	rm -rf common_include;
+	cp -r ~/erlang/simple_system/common_include .
 	rm -rf _build;
 	rm -rf ebin;
 	rm -rf rebar.lock
@@ -125,6 +131,6 @@ eunit:
 	#INFO: Starts the eunit testing .................
 	erl -pa ebin -pa priv\
 	 -pa test_ebin\
-	 -sname rd_service_a\
+	 -sname log_service_a\
 	 -run $(m) start\
 	 -setcookie a
