@@ -23,7 +23,7 @@ all:
 	rm -rf *_a;
 	#INFO: Compile application
 	rm -rf common_include;
-	cp -r ~/erlang/common_include .
+	git clone https://github.com/joq62/common_include.git;
 	rebar3 compile;	
 	rm -rf _build*;
 	rebar3 edoc;
@@ -104,8 +104,8 @@ eunit:
 	rm -rf test/*.beam test/*/*.beam;
 	rm -rf *.beam;
 	#INFO: Deleting files and dirs created during builds
-	rm -rf common_include;
-	cp -r ~/erlang/common_include .
+	#rm -rf common_include;
+	#cp -r ~/erlang/common_include .
 	rm -rf _build;
 	rm -rf ebin;
 	rm -rf rebar.lock
@@ -117,6 +117,8 @@ eunit:
 	cp test/*.app test_ebin;
 	#rm test/dependent_apps.erl;
 	#cp /home/joq62/erlang/dev_support/dependent_apps.erl test;
+	rm -rf common_include;
+	git clone https://github.com/joq62/common_include.git;
 	erlc -I include -I common_include -o test_ebin test/*.erl;
 #	erlc -I include\
 #	 -I /home/joq62/erlang/include\
