@@ -144,9 +144,7 @@ get_state()->
 %% @end
 %%--------------------------------------------------------------------
 init([]) ->
-
-  %  ?LOG_NOTICE("Server started ",[]),
-    {ok, #state{}}.
+    {ok, #state{},0}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -330,12 +328,17 @@ handle_cast(_Msg, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_info(timeout, State) ->
-    io:format("dbg ~p~n",[{timeout,?MODULE,?LINE}]),
-    Result=lib_log:create_logfile(State#state.main_log_dir,
-				  State#state.log_file,
-				  State#state.log_file_path,
-				  State#state.max_log_length),
-    ?LOG_NOTICE("Server started and created log file with result",[Result]),
+    %% Create logfiles
+    file:del_dir_r(?MainLogDir),
+    file:make_dir(?MainLogDir),
+    NodeNodeLogDir=?MainLogDir,
+    case lib_log:create_logger(NodeNodeLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes) of
+	ok->
+	    ?LOG_NOTICE("Log dirs and file created",[NodeNodeLogDir]);
+	LogError->
+	    ?LOG_WARNING("Failed to create log dir and file ",[LogError])
+    end,
+    ?LOG_NOTICE("Server started ",[]),
     {noreply, State};
 
 handle_info(Info, State) ->
