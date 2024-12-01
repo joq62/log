@@ -15,6 +15,7 @@
 -include("logs.hrl").
 %% API
 -export([
+	 create_logger/4,
 	 create_logger/5,
 
 	 is_config/0,
@@ -76,6 +77,14 @@ start_link() ->
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
+%%--------------------------------------------------------------------
+%% @doc
+%% 
+%% @end
+%%--------------------------------------------------------------------
+create_logger(MainLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
+    gen_server:call(?SERVER, {create_logger,MainLogDir,LogFile,MaxNumFiles,MaxNumBytes},infinity).
+
 %%--------------------------------------------------------------------
 %% @doc
 %% 
@@ -332,7 +341,7 @@ handle_info(timeout, State) ->
     file:del_dir_r(?MainLogDir),
     file:make_dir(?MainLogDir),
     NodeNodeLogDir=?MainLogDir,
-    case lib_log:create_logger(NodeNodeLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes) of
+    case lib_log:create_logger(?MainLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes) of
 	ok->
 	    ?LOG_NOTICE("Log dirs and file created",[NodeNodeLogDir]);
 	LogError->

@@ -12,6 +12,7 @@
 -module(lib_log).    
  
 -export([
+	 create_logger/4,
 	 create_logger/5,
 	 parse/1
 
@@ -57,6 +58,37 @@ parse_item({TimeStamp,_Time,SenderNode,SenderPid,Module,Function,Line,Data,MsgAs
 %% Description: Based on hosts.config file checks which hosts are avaible
 %% Returns: List({HostId,Ip,SshPort,Uid,Pwd}
 %% --------------------------------------------------------------------
+create_logger(MainLogDir,LogFile,MaxNumFiles,MaxNumBytes)->
+
+%    LocalLogDirFullPath=filename:join(MainLogDir,LocalLogDir),
+%    LogFileFullPath=filename:join(LocalLogDirFullPath,LogFile),
+    LogFileFullPath=filename:join(MainLogDir,LogFile),
+  
+    file:make_dir(MainLogDir),
+ %   file:make_dir(LocalLogDirFullPath),
+    Result=case logger:add_handler(my_standar_disk_h, logger_std_h,
+			  #{formatter => {logger_formatter,
+					  #{ template => [
+							  timestamp," | ",
+							  sender_time," | ",
+							  level," | ",
+							  sender_node," | ",
+							  sender_pid," | ",
+							  sender_module," | ",
+							  sender_function," | ",
+							  sender_line," | ",
+							  msg," | ",
+							  sender_data,"\n"
+							 ]}}}) of
+	       {error,{already_exist,my_standar_disk_h}}->
+		  %  add_handler(LogFileFullPath,LocalLogDirFullPath,MaxNumFiles,MaxNumBytes);
+		   add_handler(LogFileFullPath,MainLogDir,MaxNumFiles,MaxNumBytes);
+	       {error,Reason}->
+		   {error,["Error when creating LogFile :",MainLogDir,Reason,?MODULE,?LINE]};
+	       ok->
+		   add_handler(LogFileFullPath,MainLogDir,MaxNumFiles,MaxNumBytes)
+	   end,
+    Result.
 
 %% --------------------------------------------------------------------
 %% Function: available_hosts()
