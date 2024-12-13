@@ -153,7 +153,19 @@ get_state()->
 %% @end
 %%--------------------------------------------------------------------
 init([]) ->
-    {ok, #state{},0}.
+    %%- Create logfiles
+    file:del_dir_r(?MainLogDir),
+    file:make_dir(?MainLogDir),
+    [NodeName,_HostName]=string:tokens(atom_to_list(node()),"@"),
+    MainLogDir=filename:join(?MainLogDir,NodeName),
+    ok=lib_log:create_logger(MainLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
+    {ok, #state{
+	    main_log_dir=MainLogDir,
+	    local_log_dir=?LocalLogDir,	
+	    logfile=?LogFile,
+	    max_num_files=?MaxNumFiles,
+	    max_num_bytes=?MaxNumBytes}
+    }.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -336,20 +348,6 @@ handle_cast(_Msg, State) ->
 %% Handling all non call/cast messages
 %% @end
 %%--------------------------------------------------------------------
-handle_info(timeout, State) ->
-    %% Create logfiles
-    file:del_dir_r(?MainLogDir),
-    file:make_dir(?MainLogDir),
-    NodeNodeLogDir=?MainLogDir,
-    case lib_log:create_logger(?MainLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes) of
-	ok->
-	    ?LOG_NOTICE("Log dirs and file created",[NodeNodeLogDir]);
-	LogError->
-	    ?LOG_WARNING("Failed to create log dir and file ",[LogError])
-    end,
-    ?LOG_NOTICE("Server started ",[]),
-    {noreply, State};
-
 handle_info(Info, State) ->
     io:format("dbg unmatched signal ~p~n",[{Info,?MODULE,?LINE}]),
     %rpc:cast(node(),log,log,[?Log_ticket("unmatched info",[Info])]),
