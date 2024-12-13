@@ -24,7 +24,7 @@
 	 read/1,
 	 log/4,
 
-	 debug/3,notice/3,warning/3,alert/3,
+	 debug/8,notice/8,warning/8,alert/8,
 	 create_logfile/3,
 	 create/1,
 
@@ -125,14 +125,14 @@ log(Level,ModuleString,Line,Msg)->
 
 
 
-debug(Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp})->
-    gen_server:cast(?SERVER, {debug,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}).
-notice(Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp})->
-    gen_server:cast(?SERVER, {notice,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}).
-warning(Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp})->
-    gen_server:cast(?SERVER, {warning,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}).
-alert(Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp})->
-    gen_server:cast(?SERVER, {alert,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}).
+debug(Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp)->
+    gen_server:cast(?SERVER, {debug,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}).
+notice(Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp)->
+    gen_server:cast(?SERVER, {notice,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}).
+warning(Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp)->
+    gen_server:cast(?SERVER, {warning,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}).
+alert(Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp)->
+    gen_server:cast(?SERVER, {alert,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}).
 
 
 %%--------------------------------------------------------------------
@@ -245,10 +245,9 @@ handle_call(Request, From, State) ->
 %% Handling cast messages
 %% @end
 %%--------------------------------------------------------------------
-handle_cast({debug,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}, State) ->
+handle_cast({debug,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}, State) ->
     R= io_lib:format("~p",[Msg]),
     MsgAsString=lists:flatten(R),
-    
     logger:debug(MsgAsString,#{timestamp=>TimeStamp,
 			       sender_time=>calendar:now_to_datetime(TimeStamp),
 			       sender_node=>SenderNode,
@@ -267,11 +266,9 @@ handle_cast({debug,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeS
     end,
     {noreply,NewState};
 
-handle_cast({notice,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}, State) ->
+handle_cast({notice,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}, State) ->
     R= io_lib:format("~p",[Msg]),
     MsgAsString=lists:flatten(R),
-  %  R_data= io_lib:format("~p",[Data]),
-  %  DataAsString=lists:flatten(R_data),
     logger:notice(MsgAsString,#{timestamp=>TimeStamp,
 				sender_time=>calendar:now_to_datetime(TimeStamp),
 				sender_node=>SenderNode,
@@ -281,7 +278,6 @@ handle_cast({notice,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,Time
 				sender_line=>Line,
 				sender_data=>Data}),
     Len=length(State#state.notice),
-						%   io:format("notice Len= ~p~n",[{Len,?MODULE,?LINE}]),
     if
 	Len<State#state.max_log_length->
 	    NewState=State#state{notice=[{TimeStamp,SenderNode,SenderPid,Module,FunctionName,Line,MsgAsString,Data}|State#state.notice]};
@@ -291,7 +287,7 @@ handle_cast({notice,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,Time
     end,
     {noreply,NewState};
 
-handle_cast({warning,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}, State) ->
+handle_cast({warning,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}, State) ->
     R= io_lib:format("~p",[Msg]),
     MsgAsString=lists:flatten(R),
     logger:warning(MsgAsString,#{timestamp=>TimeStamp,
@@ -313,7 +309,7 @@ handle_cast({warning,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,Tim
     end,
     {noreply,NewState};
 
-handle_cast({alert,Msg,Data,{SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}}, State) ->
+handle_cast({alert,Msg,Data,SenderNode,SenderPid,Module,FunctionName,Line,TimeStamp}, State) ->
     R= io_lib:format("~p",[Msg]),
     MsgAsString=lists:flatten(R),
     logger:alert(MsgAsString,#{timestamp=>TimeStamp,
