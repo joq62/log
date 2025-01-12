@@ -9,6 +9,7 @@ all:
 	rm -rf catalog application_dir deployment_specs catalog_specs;
 	rm -rf doc;
 	rm -rf test_ebin;
+	rm -rf test_log.txt;
 	#INFO: Deleting tilde files and beams
 	rm -rf *~ */*~ */*/*~;
 	rm -rf src/*.beam src/*/*.beam;
@@ -45,6 +46,7 @@ build:
 	rm -rf catalog application_dir deployment_specs catalog_specs;
 	rm -rf doc;
 	rm -rf test_ebin;
+	rm -rf test_log.txt;
 	#INFO: Deleting tilde files and beams
 	rm -rf *~ */*~ */*/*~;
 	rm -rf src/*.beam src/*/*.beam;
@@ -75,6 +77,7 @@ clean:
 	rm -rf inventory;
 	rm -rf catalog application_dir deployment_specs catalog_specs;
 	rm -rf test_ebin;
+	rm -rf test_log.txt;
 	#INFO: Deleting tilde files and beams
 	rm -rf *~ */*~ */*/*~;
 	rm -rf src/*.beam src/*/*.beam;

@@ -154,11 +154,15 @@ get_state()->
 %%--------------------------------------------------------------------
 init([]) ->
     %%- Create logfiles
-    file:del_dir_r(?MainLogDir),
-    file:make_dir(?MainLogDir),
+    file:delete(?TestLog),
+        
+    DelResult=file:del_dir_r(?MainLogDir),
+    MakeDirResult=file:make_dir(?MainLogDir),
     [NodeName,_HostName]=string:tokens(atom_to_list(node()),"@"),
     MainLogDir=filename:join(?MainLogDir,NodeName),
-    ok=lib_log:create_logger(MainLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
+    CreateLoggerResult=lib_log:create_logger(MainLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
+    Term=[DelResult,MakeDirResult,CreateLoggerResult],
+    unconsult(?TestLog,Term),
     {ok, #state{
 	    main_log_dir=MainLogDir,
 	    local_log_dir=?LocalLogDir,	
@@ -392,3 +396,8 @@ format_status(_Opt, Status) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+unconsult(File,TermList)->
+    {ok,S}=file:open(File,write),
+    lists:foreach(fun(X)->
+			  io:format(S,"~p.~n",[X]) end, TermList),
+    file:close(S).
