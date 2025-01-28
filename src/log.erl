@@ -155,16 +155,24 @@ get_state()->
 init([]) ->
     %%- Create logfiles
     file:delete(?TestLog),
-        
-    DelResult=file:del_dir_r(?MainLogDir),
-    MakeDirResult=file:make_dir(?MainLogDir),
+
+    %% Ensure that log file will end up on home dir
+    {ok,HomeDir}=case os:getenv("HOME") of
+		  false -> 
+		      {error,["Environment variable HOME not set"]};
+		  Path -> 
+		      {ok,Path}
+	      end, 
+    RootLogDir=filename:join(HomeDir,?MainLogDir),
+    MakeRootDirResult=file:make_dir(RootLogDir),
     [NodeName,_HostName]=string:tokens(atom_to_list(node()),"@"),
-    MainLogDir=filename:join(?MainLogDir,NodeName),
-    CreateLoggerResult=lib_log:create_logger(MainLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
-    Term=[DelResult,MakeDirResult,CreateLoggerResult],
+    ApplicationLogDir=filename:join(RootLogDir,NodeName),
+    MakeApplicationDirResult=file:make_dir(ApplicationLogDir),
+    CreateLoggerResult=lib_log:create_logger(ApplicationLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
+    Term=[MakeRootDirResult,MakeApplicationDirResult,CreateLoggerResult,RootLogDir,ApplicationLogDir],
     unconsult(?TestLog,Term),
     {ok, #state{
-	    main_log_dir=MainLogDir,
+	    main_log_dir=ApplicationLogDir,
 	    local_log_dir=?LocalLogDir,	
 	    logfile=?LogFile,
 	    max_num_files=?MaxNumFiles,
