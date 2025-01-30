@@ -157,11 +157,12 @@ init([]) ->
     file:delete(?TestLog),
 
     %% Ensure that log file will end up on home dir
-    {ok,HomeDir}=case os:getenv("HOME") of
+    {ok,HomeDir}=case os:getenv("USER") of
 		  false -> 
-		      {error,["Environment variable HOME not set"]};
-		  Path -> 
-		      {ok,Path}
+		      {error,["Environment variable USER not set"]};
+		  UserName ->
+			 Path=filename:join("/home/",UserName),
+			 {ok,Path}
 	      end, 
     RootLogDir=filename:join(HomeDir,?MainLogDir),
     MakeRootDirResult=file:make_dir(RootLogDir),
@@ -169,7 +170,7 @@ init([]) ->
     ApplicationLogDir=filename:join(RootLogDir,NodeName),
     MakeApplicationDirResult=file:make_dir(ApplicationLogDir),
     CreateLoggerResult=lib_log:create_logger(ApplicationLogDir,?LocalLogDir,?LogFile,?MaxNumFiles,?MaxNumBytes),
-    Term=[MakeRootDirResult,MakeApplicationDirResult,CreateLoggerResult,RootLogDir,ApplicationLogDir],
+    Term=[HomeDir,MakeRootDirResult,MakeApplicationDirResult,CreateLoggerResult,RootLogDir,ApplicationLogDir],
     unconsult(?TestLog,Term),
     {ok, #state{
 	    main_log_dir=ApplicationLogDir,
