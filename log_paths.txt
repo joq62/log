@@ -1,0 +1,2 @@
+ cat control/_build/default/rel/control/add_test/_build/default/rel/add_test/logs/add_test/log.logs/file.1
+ 

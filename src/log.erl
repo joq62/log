@@ -164,7 +164,8 @@ init([]) ->
 			 Path=filename:join("/home/",UserName),
 			 {ok,Path}
 	      end, 
-    RootLogDir=filename:join(HomeDir,?MainLogDir),
+%    RootLogDir=filename:join(HomeDir,?MainLogDir),
+    RootLogDir=?MainLogDir,
     MakeRootDirResult=file:make_dir(RootLogDir),
     [NodeName,_HostName]=string:tokens(atom_to_list(node()),"@"),
     ApplicationLogDir=filename:join(RootLogDir,NodeName),
